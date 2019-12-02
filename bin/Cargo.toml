@@ -1,0 +1,6 @@
+[package]
+name = "bin"
+version = "0.1.0"
+authors = ["Dylan-Phoon <dylanphoon@gmail.com>"]
+
+[dependencies]
