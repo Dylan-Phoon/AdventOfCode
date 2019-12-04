@@ -1,11 +1,11 @@
 use std::fs;
 
 fn main() {
-	let input = fs::read_to_string("input.txt").expect("could not read input.txt");
+	let input = String::from("100000000-1000000000");//fs::read_to_string("input.txt").expect("could not read input.txt");
 	let starting_nums: Vec<&str> = input.split("-").collect();
 
-	let part_one_solution = part_one(starting_nums[0], starting_nums[1]);
-	println!("Part one solution: {:?}", part_one_solution);
+	//let part_one_solution = part_one(starting_nums[0], starting_nums[1]);
+	//println!("Part one solution: {:?}", part_one_solution);
 
 	let part_two_solution = part_two(starting_nums[0], starting_nums[1]);
 	println!("Part two solution {:?}", part_two_solution);
@@ -46,6 +46,10 @@ fn part_two(min: &str, max: &str) -> u64 {
 	let (mut curr, mut max) = (min.parse::<u64>().unwrap(), max.parse::<u64>().unwrap());
 	while curr < max {
 		curr += 1;
+		if curr % 1000000 == 0 {
+			print!("{}[2J", 27 as char);
+			println!("{:?}% done...", (curr as f64 / (max - min.parse::<u64>().unwrap()) as f64) as f64);
+		}
 		let arr_char_curr: Vec<char> = curr.to_string().chars().collect();
 		let (mut is_solution, mut min_tmp) = (false, 0);
 		for i in 0..arr_char_curr.len() {
