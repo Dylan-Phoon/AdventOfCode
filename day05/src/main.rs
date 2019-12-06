@@ -35,14 +35,14 @@ fn get_value (param: i32, param_mode: Option<&usize>, bytes: &Vec<i32>) -> i32 {
 	else { panic!("Invalid Parameter Mode: {:?}", *usize_param_mode); }
 }
 
-struct int_machine {
+struct IntMachine {
 	ip: usize,
 	op_code: usize,
 	full_op_arr: Vec<usize>,
 	bytes: Vec<i32>,
 }
 
-impl int_machine {
+impl IntMachine {
 	pub fn new(bytes: Vec<i32>) -> Self {
 		Self {
 			ip: 0,
@@ -53,8 +53,8 @@ impl int_machine {
 	}
 
 	// Offset is the parameter location distance from the current ip
-	fn get_value(&self, offset: usize) -> i32 {
-		let param_mode = self.full_op_arr.get(offset + 1).unwrap_or(&0); //+1 because the first two items are the op code itself (see below)
+	fn get_value(&self, offset: usize, full_op_arr: &Vec<usize>) -> i32 {
+		let param_mode = full_op_arr.get(offset + 1).unwrap_or(&0); //+1 because the first two items are the op code itself (see below)
 		let param = self.bytes[self.ip + offset];
 		if *param_mode == POSITION { return self.bytes[param as usize]; }
 		else if *param_mode == IMMEDIATE { return param }
@@ -63,12 +63,12 @@ impl int_machine {
 }
 
 fn part_two(mut bytes: Vec<i32>, input: i32) -> i32 {
-	let mut im = int_machine::new(bytes);
+	let mut im = IntMachine::new(bytes);
 	while im.ip < im.bytes.len() {
 		let op_code = im.bytes[im.ip] % 100; //1002 % 100 == 2 and 2 % 100 == 2
 		//Get the integer (1002), convert to string ("1002"), split it (['1','0','0','2']),
         //then reverse it (['2','0','0','1'])
-		im.full_op_arr = im.bytes[im.ip].to_string().chars().rev().map(|chr| chr.to_digit(10).unwrap() as usize).collect();
+		let full_op_arr: Vec<usize> = im.bytes[im.ip].to_string().chars().rev().map(|chr| chr.to_digit(10).unwrap() as usize).collect();
 		match op_code {
 			INPUT => {
 				let mstore_addr = im.bytes[im.ip+1] as usize;
@@ -76,13 +76,13 @@ fn part_two(mut bytes: Vec<i32>, input: i32) -> i32 {
 				im.ip += 2;
 			}
 			ADD => {
-				let (num_1, num_2) = (im.get_value(1), im.get_value(2)); 
+				let (num_1, num_2) = (im.get_value(1, &full_op_arr), im.get_value(2, &full_op_arr)); 
 				let mstore_addr = im.bytes[im.ip + 3] as usize;
 				im.bytes[mstore_addr] = num_1 + num_2;
 				im.ip += 4;
 			},
 			MUL => {
-				let (num_1, num_2) = (im.get_value(1), im.get_value(2)); 
+				let (num_1, num_2) = (im.get_value(1, &full_op_arr), im.get_value(2, &full_op_arr)); 
 				let mstore_addr = im.bytes[im.ip + 3] as usize;
 				im.bytes[mstore_addr] = num_1 * num_2;
 				im.ip += 4;	
@@ -93,25 +93,25 @@ fn part_two(mut bytes: Vec<i32>, input: i32) -> i32 {
 				im.ip += 2;
 			},
 			JUMP_TRUE => {
-				let jump_check = im.get_value(1);
+				let jump_check = im.get_value(1, &full_op_arr);
 				if jump_check > 0 {
-					im.ip = im.get_value(2) as usize;
+					im.ip = im.get_value(2, &full_op_arr) as usize;
 				} else { im.ip += 3; }
 			},
 			JUMP_FALSE => {
-				let jump_check = im.get_value(1);
+				let jump_check = im.get_value(1, &full_op_arr);
 				if jump_check == 0 {
-					im.ip = im.get_value(2) as usize;
+					im.ip = im.get_value(2, &full_op_arr) as usize;
 				} else { im.ip += 3; }
 			}, 
 			LT => {
-				let (num_1, num_2) = (im.get_value(1), im.get_value(2));
+				let (num_1, num_2) = (im.get_value(1, &full_op_arr), im.get_value(2, &full_op_arr));
 				let mstore_addr = im.bytes[im.ip+3] as usize;
 				im.bytes[mstore_addr] = {if num_1 < num_2 { 1 } else { 0 }};
 				im.ip += 4;
 			},
 			EQ => {
-				let (num_1, num_2) = (im.get_value(1), im.get_value(2));
+				let (num_1, num_2) = (im.get_value(1, &full_op_arr), im.get_value(2, &full_op_arr));
 				let mstore_addr = im.bytes[im.ip+3] as usize;
 				im.bytes[mstore_addr] = {if num_1 == num_2 { 1 } else { 0 }};
 				im.ip += 4;

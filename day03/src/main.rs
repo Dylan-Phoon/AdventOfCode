@@ -87,9 +87,9 @@ fn part_two(input: &str) -> u32 {
                 curr_wire_info.travel_distance += 1;
                 if let Some(wire_info) = points.get(&wire_point) {
                     if (*wire_info).wire_id != curr_wire_id {
-                        let total_length = (*wire_info).travel_distance + curr_wire_info.travel_distance;
-                        if total_length < min_length || min_length == 0 {
-                        min_length = total_length;
+                            let total_length = (*wire_info).travel_distance + curr_wire_info.travel_distance;
+                            if total_length < min_length || min_length == 0 {
+                            min_length = total_length;
                         }
                     }
                 }
