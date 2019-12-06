@@ -1,10 +1,11 @@
 use std::fs;
 use std::collections::HashMap;
+use std::error::Error;
 
 fn main() {
     let input = fs::read_to_string("input.txt").expect("error reading input.txt");
     let part_one_solution = part_one(&input); //Array brute force O(n^2)
-    println!("Part two solution {:?}", part_two_solution);
+    println!("Part one solution {:?}", part_one_solution);
 
     let part_two_solution = part_two(&input); //Hash Map list O(2n) 
     println!("Part two solution {:?}", part_two_solution);
@@ -26,7 +27,7 @@ impl<'a> Planet<'a> {
 	}
 }
 
-//naive array brute force solution (see part_two for the better implementation)
+//naive array brute force solution (see part_two for the better, much faster, implementation)
 fn part_one(input: &str) -> u32 {
 	let planets: Vec<Planet> = input.lines()
 									.map(|str_planet| Planet::new(str_planet))
@@ -51,8 +52,10 @@ fn part_one(input: &str) -> u32 {
 }
 
 //Solution using hash maps
-fn part_two(input: &str) -> i32 {
-	let planets: Vec<Planet> = input.lines().map(|str_planet| Planet::new(str_planet)).collect();
+fn part_two(input: &str) -> Result<i32, &str> {
+	let planets: Vec<Planet> = input.lines()
+									.map(|str_planet| Planet::new(str_planet))
+									.collect();
 
 	let mut hashmap_planets: HashMap<&str, &str> = HashMap::new();
 	for planet in &planets { 
@@ -67,12 +70,12 @@ fn part_two(input: &str) -> i32 {
 			total += 1;
 			curr_planet = hashmap_planets.get(curr_planet).unwrap();
 			if santa_positions.contains_key(curr_planet) {
-				return santa_positions.get(curr_planet).unwrap() + total;
+				return Result::Ok(santa_positions.get(curr_planet).unwrap() + total);
 			}
 			//Push our position each time to a hash map
 			santa_positions.insert(curr_planet, total);
 		}
 		total = -1;
 	}
-	return total;
+	return Err(&"Could not find a path from YOU to SAN");
 }
