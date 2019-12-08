@@ -32,7 +32,7 @@ fn main() {
 
 	println!("\nRunning Part Two: ");
 	let part_two_solution = part_two(bytes.clone());
-	println!("{:?}", part_two_solution);
+	println!("Part two solution: {:?}", part_two_solution);
 }
 
 fn get_value (param: i64, param_mode: Option<&usize>, bytes: &Vec<i64>) -> i64 {
@@ -196,6 +196,7 @@ fn part_two(mut bytes: Vec<i64>) -> i64 {
 				let mut tmp_curr_output = Arc::clone(&curr_output);
 				let mut tmp_max_output = Arc::clone(&max_output);
 				let handle = thread::spawn(move || {
+					//this just assumes that 'E will be the last to halt (it might not so need to add an ID check here)
 					*tmp_curr_output.lock().unwrap() = amplifier.execute();
 					if *tmp_curr_output.lock().unwrap() > *tmp_max_output.lock().unwrap() {
 						*tmp_max_output.lock().unwrap() = *tmp_curr_output.lock().unwrap();
