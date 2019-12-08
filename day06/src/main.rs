@@ -4,10 +4,10 @@ use std::error::Error;
 
 fn main() {
     let input = fs::read_to_string("input.txt").expect("error reading input.txt");
-    let part_one_solution = part_one(&input); //Array brute force O(n^2)
+    let part_one_solution = part_one(&input); //Array brute force (very bad solution...) O(n!)
     println!("Part one solution {:?}", part_one_solution);
 
-    let part_two_solution = part_two(&input); //Hash Map list O(2n) 
+    let part_two_solution = part_two(&input); //Hash Map list (much better solution!) O(2n) 
     println!("Part two solution {:?}", part_two_solution);
 }
 
